@@ -8,6 +8,11 @@
 #include <WiFiMulti.h>
 #include <Teto.h>
 #include <MusicPlayer.h>
+#include <BleKeyboard.h>
+#include <Bluetooth.h>
+
+BleKeyboard Player("Teto Watch"); //Bluetooth Name
+
 //Screen
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64
@@ -44,11 +49,13 @@ bool quote = 1;
 bool TetoFrame = 0;
 bool LastButtonState = 1;
 bool DisplayState = 0;
+bool DisplayOnState = 1;
 unsigned long LastClock = 0;
 unsigned long LastTeto = 0;
 unsigned long ClearDisplayClock = 0;
 unsigned long ButtonClock = 0;
 unsigned long pressStartTime = 0;
+unsigned long now ;
 char PMStr[3] = "PM";
 char timeStr[8] = "12:00PM";
 ; 
@@ -170,18 +177,25 @@ void DisplayTeto(bool TetoFrame) {
 
   void ButtonPress(bool ButtonState , bool& LastButtonState) {
 
-   if(ButtonState == HIGH && LastButtonState == LOW){
+   if(ButtonState == LOW && LastButtonState == HIGH){
    pressStartTime = millis(); // Record the time when the button is pressed  
   }
   
-  if(ButtonState == LOW && LastButtonState == HIGH) {
+  if(ButtonState == HIGH && LastButtonState == LOW) {
     unsigned long pressDuration = millis() - pressStartTime; // Calculate the duration of the button press
-    if (pressDuration >= 2000) { // Check if the button was pressed for 2 seconds or more
-     MusicPlayer_Draw();
+    
+    if (pressDuration >= 1000) { // Check if the button was pressed for 1.5 seconds or more
+      
+      DisplayState = !DisplayState; // Toggle the display state
+
+      display.clearDisplay(); // Clear the display when toggling
     } 
-    else if(pressDuration >= 500) { // Short press
-     DisplayOn(DisplayState); // Short press, turn on the display
-      DisplayState = !DisplayState; // Toggle the display state for the next press
+    else if(pressDuration >= 300) { // Short press Close the Display
+
+     DisplayOn(DisplayOnState); // Short press, turn on the display
+
+      DisplayOnState = !DisplayOnState; // Toggle the display state for the next press
+
     }
 
   }
@@ -192,6 +206,8 @@ void DisplayTeto(bool TetoFrame) {
 //++++++++++++++++++++++++++++++++++++++++++ Setup and Loop ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   void setup() {
   Serial.begin(115200);
+
+    Player.begin();
 
   
  if (!display.begin(SSD1306_SWITCHCAPVCC)) {
@@ -243,13 +259,13 @@ display.display();
 
 void loop() {
 
-    unsigned long now = millis();
+     now = millis();
 
     ButtonState = digitalRead(Button); // Read the button state
 
+    if(DisplayState)
+    ButtonPress(ButtonState, LastButtonState); // Handle button press logic for the Clock Display Only
     
-    ButtonPress(ButtonState, LastButtonState); // Handle button press logic
-
 
     if(now - ClearDisplayClock >= 1000){ // Clear the display every 1 second
       ClearDisplayClock = now;
@@ -284,11 +300,18 @@ if(now - LastTeto >= 1000){ // Update Teto every 1 seconds
   TetoFrame = !TetoFrame; // Toggle Teto frame for next update
 }
 
+if(DisplayState){
 DisplayTime(timeStr);
-
 DisplayTeto(TetoFrame);
-
 DisplayDate(day, month, year);
+if(Player.isConnected())
+display.drawBitmap(115,0,bluetooth,10,10,SSD1306_WHITE);
+}
+
+
+else{
+     MusicPlayer_Draw();
+}
 
 display.display();
 
