@@ -10,6 +10,7 @@
 #include <MusicPlayer.h>
 #include <BleKeyboard.h>
 #include <Bluetooth.h>
+#include <TetoWalk.h>
 
 BleKeyboard Player("Teto Watch"); //Bluetooth Name
 
@@ -43,18 +44,20 @@ int seconds = 50;
 int day = 18;
 int month = 8;
 int year = 2026;
+int TetoWalkFrame = 0;
 bool ButtonState = 0;
-bool isPM = 0;
+bool isPM = 0; // Change this if you want to change the PM or AM not the actual string
 bool quote = 1;
 bool TetoFrame = 0;
 bool LastButtonState = 1;
-bool DisplayState = 0;
+bool DisplayState = 1;
 bool DisplayOnState = 1;
 unsigned long LastClock = 0;
 unsigned long LastTeto = 0;
 unsigned long ClearDisplayClock = 0;
 unsigned long ButtonClock = 0;
 unsigned long pressStartTime = 0;
+unsigned long TetoWalkFrameTime = 0;
 unsigned long now ;
 char PMStr[3] = "PM";
 char timeStr[8] = "12:00PM";
@@ -203,6 +206,7 @@ void DisplayTeto(bool TetoFrame) {
   }
 
 
+
 //++++++++++++++++++++++++++++++++++++++++++ Setup and Loop ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   void setup() {
   Serial.begin(115200);
@@ -304,8 +308,11 @@ if(DisplayState){
 DisplayTime(timeStr);
 DisplayTeto(TetoFrame);
 DisplayDate(day, month, year);
+// notifacation
 if(Player.isConnected())
 display.drawBitmap(115,0,bluetooth,10,10,SSD1306_WHITE);
+if(PauseState && Player.isConnected())
+display.drawBitmap(100,0,M_icon,10,10,SSD1306_WHITE); // display the music playing icon 
 }
 
 

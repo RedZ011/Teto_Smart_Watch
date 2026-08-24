@@ -2,9 +2,13 @@
 #include <Arduino.h>
 #include <Next.h>
 #include <Back.h>
-# include <Play.h>
+#include <Play.h>
 #include <Pause.h>
 #include <Bluetooth.h>
+#include <BigTeto.h>
+#include <MusicPlayerIcons.h>
+
+
 
 int tapCount = 0; // Variable to count the number of taps
 bool PauseState = false; 
@@ -13,7 +17,9 @@ bool BackPressed = false;
 bool LastPauseState = false;
 bool LastNextState = false;
 bool LastBackState = false;
+bool BigTetoFrame = false;
 unsigned long Duration = 0;
+unsigned long TetoDuration = 0;
 unsigned long PauseDuration = 0;
 unsigned long BackDuration = 0;
 unsigned long NextDuration = 0;
@@ -214,15 +220,74 @@ void DisplayButtons(){
   BackButton();
 }
 
+void DisplayTeto2(){
+    const unsigned char* current_frame = (const unsigned char*)pgm_read_ptr(&(TETO_ARR[(int)BigTetoFrame]));
+
+  if(!BigTetoFrame){
+  display.drawBitmap(40,-5,current_frame,50,50,SSD1306_WHITE);
+}
+else{
+  display.drawBitmap(40,0,current_frame,50,50,SSD1306_WHITE);
+}
+}
+
+
+
+
+void Display_M_icons(){
+  if(BigTetoFrame){
+    //left
+  display.drawBitmap(35,10,musicnote1,10,10,SSD1306_WHITE); //top
+  display.drawBitmap(30,25,musicnote2,10,10,SSD1306_WHITE);//bottom
+  display.drawBitmap(22,18,musicnote1,10,10,SSD1306_WHITE);//middle
+  //right
+  display.drawBitmap(90,10,musicnote1,10,10,SSD1306_WHITE);//top
+  display.drawBitmap(90,25,musicnote2,10,10,SSD1306_WHITE);//bottom
+  display.drawBitmap(98,15,musicnote1,10,10,SSD1306_WHITE);//middle
+  }
+  else{
+    //left
+  display.drawBitmap(35,15,musicnote1,10,10,SSD1306_WHITE); //top
+  display.drawBitmap(30,30,musicnote2,10,10,SSD1306_WHITE);//bottom
+  display.drawBitmap(22,23,musicnote1,10,10,SSD1306_WHITE);//middle
+  //right
+  display.drawBitmap(90,15,musicnote1,10,10,SSD1306_WHITE);//top
+  display.drawBitmap(90,30,musicnote2,10,10,SSD1306_WHITE);//bottom
+  display.drawBitmap(98,20,musicnote1,10,10,SSD1306_WHITE);//middle
+  }
+
+  
+}
+
+
 void MusicPlayer_Draw() {
   now1 = millis();
   // actual drawing code here
 display.clearDisplay();
 
-display.drawBitmap(40,0,Teto3,50,50,SSD1306_WHITE);
+
+if(Player.isConnected() && PauseState){  // move teto if there is connection and the music is playing
+
+if(now1 - TetoDuration >= 1000){
+  TetoDuration = now1;
+  BigTetoFrame = !BigTetoFrame;
+
+
+}
+
+display.drawBitmap(100,0,M_icon,10,10,SSD1306_WHITE); // display the music playing icon
+
+Display_M_icons();
+
+}
+else
+  BigTetoFrame = false; // don't move teto if there is no connection
+
+
+
 
 if(Player.isConnected())
-display.drawBitmap(115,0,bluetooth,10,10,SSD1306_WHITE);
+display.drawBitmap(115,0,bluetooth,10,10,SSD1306_WHITE); // show the bluetooth icon if connected to bluetooth
 
 if (now1 - Duration >= 1000 )
 {
@@ -232,17 +297,23 @@ Duration = now1;
 
 
 
-MusicPlayer_HandleButton(tapCount);     
+MusicPlayer_HandleButton(tapCount);   // Handle the Taps
 
 tapCount = 0;
 
 
 }
 
-DisplayButtons();
+DisplayButtons(); //display the player buttons
+
+
+DisplayTeto2(); // display the teto frames
+
+
 
 if(!DisplayState)
 M_ButtonPress(ButtonState, LastButtonState); // Handle button press logic for the Music Player Display Only
+
 
 display.display();
 
