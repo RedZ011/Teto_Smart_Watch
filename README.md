@@ -2,7 +2,8 @@
 
 A DIY smartwatch built from scratch on an ESP32-C3, featuring a Kasane Teto-themed OLED display, an animated background character, and Bluetooth media controls for your phone.
 
-![Teto Watch](docs/images/hero.jpg)
+![Teto Watch](<img width="1718" height="1722" alt="VideoCapture_20261029-010051" src="https://github.com/user-attachments/assets/29f5aac5-dd8b-4d66-ade7-12c1b0687aae" />
+)
 
 ✨ Features
 
@@ -22,11 +23,14 @@ A DIY smartwatch built from scratch on an ESP32-C3, featuring a Kasane Teto-them
 
 | Clock screen | Music player screen |
 |---|---|
-| ![Clock screen](docs/images/clock.jpg) | ![Music screen](docs/images/music.jpg) |
+| ![Clock screen](<img width="1718" height="1722" alt="VideoCapture_20261029-010051" src="https://github.com/user-attachments/assets/eb883939-6319-42aa-af7c-3b6d53a019df" />
+) | ![Music screen](<img width="475" height="452" alt="Screenshot_20261029_005421_ASD Player" src="https://github.com/user-attachments/assets/b00d8f34-0f8a-4249-8f35-b3905b3e72dc" />
+) |
 
 | Bye animation | Wiring |
 |---|---|
-| ![Bye animation](docs/images/bye.gif) | ![Wiring](docs/images/wiring.jpg) |
+| ![Bye animation](<img width="502" height="487" alt="Screenshot_20261029_011452_Video Player" src="https://github.com/user-attachments/assets/fa65ba71-1471-4a75-bd8a-6a97bbc0d571" />
+) |  |
 
 🧰 Hardware
 
